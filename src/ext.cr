@@ -104,20 +104,14 @@ class Socket
 
           if sockaddr.value.sa_family == 2 # AF_INET = 2 (IPv4)
             sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
-            address = [
-              sockaddr_in.value.sin_addr.s_addr & 0xFF,
-              (sockaddr_in.value.sin_addr.s_addr >> 8) & 0xFF,
-              (sockaddr_in.value.sin_addr.s_addr >> 16) & 0xFF,
-              sockaddr_in.value.sin_addr.s_addr >> 24
-            ].join('.')
-            ip_address = Socket::IPAddress.new(address, 0)
+            
+            ip_address = Socket::IPAddress.from(sockaddr_in, sizeof(typeof(sockaddr_in)))
 
             list << ip_address
           elsif sockaddr.value.sa_family == 23 # AF_INET6 = 23 (IPv6)
             sockaddr_in6 = sockaddr.as(Pointer(LibC::SockaddrIn6))
-            ipv6_addr = sockaddr_in6.value.sin6_addr.u.byte
-            address = ipv6_addr.each_slice(2).map { |slice| "%02x%02x" % slice }.join(':')
-            ip_address = Socket::IPAddress.new(address, 0)
+            
+            ip_address = Socket::IPAddress.from(sockaddr_in6, sizeof(typeof(sockaddr_in6)))
 
             list << ip_address
           end
@@ -136,6 +130,17 @@ class Socket
   struct IPAddress
     def self.from(sockaddr : LibC::SockaddrIn*, addrlen) : IPAddress
       case family = Family.new(sockaddr.value.sin_family.to_u8)
+      when Family::INET6
+        new(sockaddr.as(LibC::SockaddrIn6*), addrlen.to_i)
+      when Family::INET
+        new(sockaddr.as(LibC::SockaddrIn*), addrlen.to_i)
+      else
+        raise "Unsupported family type: #{family} (#{family.value})"
+      end
+    end
+
+    def self.from(sockaddr : LibC::SockaddrIn6*, addrlen) : IPAddress
+      case family = Family.new(sockaddr.value.sin6_family.to_u8)
       when Family::INET6
         new(sockaddr.as(LibC::SockaddrIn6*), addrlen.to_i)
       when Family::INET
