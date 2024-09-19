@@ -27,7 +27,7 @@ require "lib_c"
       if_index : UInt32
       next : Pointer(IP_ADAPTER_ADDRESSES)
       adapter_name : Pointer(UInt8)
-      first_unicast_address : Pointer(Void)
+      first_unicast_address : Pointer(LibC::IP_ADAPTER_UNICAST_ADDRESS)
     end
 
     struct IP_ADAPTER_UNICAST_ADDRESS
@@ -105,10 +105,10 @@ class Socket
       adapter = buffer
 
       while adapter
-        unicast_address = adapter.value.first_unicast_address.as(Pointer(LibC::IP_ADAPTER_UNICAST_ADDRESS))
+        unicast_address = adapter.value.first_unicast_address
 
         while unicast_address
-          sockaddr = unicast_address.value.address.as(Pointer(LibC::Sockaddr))
+          sockaddr = unicast_address.value.address
 
           if sockaddr.value.sa_family == Socket::Family::INET.to_i
             sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
