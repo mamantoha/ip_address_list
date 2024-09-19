@@ -7,7 +7,7 @@ require "lib_c"
       ifa_next : Pointer(Ifaddrs)
       ifa_name : UInt64
       ifa_flags : UInt32
-      ifa_addr : Pointer(Void)
+      ifa_addr : Pointer(LibC::Sockaddr)
       ifa_netmask : Pointer(Void)
       ifa_broadaddr : Pointer(Void)
       ifa_data : Pointer(Void)
@@ -61,15 +61,15 @@ class Socket
           next
         end
 
-        sockaddr = addr.value.ifa_addr.as(Pointer(LibC::SockaddrIn))
+        sockaddr = addr.value.ifa_addr
 
-        if sockaddr.value.sin_family == Socket::Family::INET.to_i
+        if sockaddr.value.sa_family == Socket::Family::INET.to_i
           sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
 
           ip_address = Socket::IPAddress.from(sockaddr_in, sizeof(typeof(sockaddr_in)))
 
           list << ip_address
-        elsif sockaddr.value.sin_family == Socket::Family::INET6.to_i
+        elsif sockaddr.value.sa_family == Socket::Family::INET6.to_i
           sockaddr_in6 = sockaddr.as(Pointer(LibC::SockaddrIn6))
 
           ip_address = Socket::IPAddress.from(sockaddr_in6, sizeof(typeof(sockaddr_in6)))
