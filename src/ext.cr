@@ -21,6 +21,7 @@ require "lib_c"
 {% if flag?(:win32) %}
   @[Link("iphlpapi")]
   lib LibC
+    # https://learn.microsoft.com/en-us/windows/win32/api/iptypes/ns-iptypes-ip_adapter_addresses_lh
     struct IP_ADAPTER_ADDRESSES
       length : UInt32
       if_index : UInt32
@@ -41,6 +42,7 @@ require "lib_c"
       address : Pointer(LibC::SOCKADDR)
     end
 
+    # https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
     fun GetAdaptersAddresses(family : UInt32, flags : UInt32, reserved : Pointer(Void), addresses : Pointer(IP_ADAPTER_ADDRESSES), size : Pointer(UInt32)) : Int32
   end
 {% end %}
@@ -106,7 +108,8 @@ class Socket
           sockaddr = unicast_address.value.address.as(Pointer(LibC::SOCKADDR))
 
           if sockaddr.value.sa_family == 2 # AF_INET = 2 (IPv4)
-            address = "#{sockaddr.value.sa_data[2]}.#{sockaddr.value.sa_data[3]}.#{sockaddr.value.sa_data[4]}.#{sockaddr.value.sa_data[5]}"
+            ipv4_addr = sockaddr.value.sa_data.to_a[2, 4]
+            address = ipv4_addr.join('.')
             ip_address = Socket::IPAddress.new(address, 0)
 
             list << ip_address
