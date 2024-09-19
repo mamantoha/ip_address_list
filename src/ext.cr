@@ -108,7 +108,7 @@ class Socket
               sockaddr_in.value.sin_addr.s_addr & 0xFF,
               (sockaddr_in.value.sin_addr.s_addr >> 8) & 0xFF,
               (sockaddr_in.value.sin_addr.s_addr >> 16) & 0xFF,
-              sockaddr_in.value.sin_addr.s_addr >> 24
+              sockaddr_in.value.sin_addr.s_addr >> 24,
             ].join('.')
             ip_address = Socket::IPAddress.new(address, 0)
 
