@@ -104,7 +104,12 @@ class Socket
 
           if sockaddr.value.sa_family == 2 # AF_INET = 2 (IPv4)
             sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
-            address = "#{sockaddr_in.value.sin_addr.s_addr & 0xFF}.#{(sockaddr_in.value.sin_addr.s_addr >> 8) & 0xFF}.#{(sockaddr_in.value.sin_addr.s_addr >> 16) & 0xFF}.#{sockaddr_in.value.sin_addr.s_addr >> 24}"
+            address = [
+              sockaddr_in.value.sin_addr.s_addr & 0xFF,
+              (sockaddr_in.value.sin_addr.s_addr >> 8) & 0xFF,
+              (sockaddr_in.value.sin_addr.s_addr >> 16) & 0xFF,
+              sockaddr_in.value.sin_addr.s_addr >> 24
+            ].join('.')
             ip_address = Socket::IPAddress.new(address, 0)
 
             list << ip_address
