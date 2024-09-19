@@ -110,13 +110,13 @@ class Socket
         while unicast_address
           sockaddr = unicast_address.value.address.as(Pointer(LibC::Sockaddr))
 
-          if sockaddr.value.sa_family == 2 # AF_INET = 2 (IPv4)
+          if sockaddr.value.sa_family == Socket::Family::INET.to_i
             sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
 
             ip_address = Socket::IPAddress.from(sockaddr_in, sizeof(typeof(sockaddr_in)))
 
             list << ip_address
-          elsif sockaddr.value.sa_family == 23 # AF_INET6 = 23 (IPv6)
+          elsif sockaddr.value.sa_family == Socket::Family::INET6.to_i
             sockaddr_in6 = sockaddr.as(Pointer(LibC::SockaddrIn6))
 
             ip_address = Socket::IPAddress.from(sockaddr_in6, sizeof(typeof(sockaddr_in6)))
