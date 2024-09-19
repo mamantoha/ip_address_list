@@ -29,7 +29,7 @@ require "lib_c"
       adapter_name : Pointer(UInt8)
       first_unicast_address : Pointer(Void)
     end
-  
+
     struct IP_ADAPTER_UNICAST_ADDRESS
       length : UInt32
       flags : UInt32
@@ -98,28 +98,28 @@ class Socket
 
       while adapter
         unicast_address = adapter.value.first_unicast_address.as(Pointer(LibC::IP_ADAPTER_UNICAST_ADDRESS))
-  
+
         while unicast_address
           sockaddr = unicast_address.value.address.as(Pointer(LibC::Sockaddr))
-  
-          if sockaddr.value.sa_family == 2  # AF_INET = 2 (IPv4)
+
+          if sockaddr.value.sa_family == 2 # AF_INET = 2 (IPv4)
             sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
             address = "#{sockaddr_in.value.sin_addr.s_addr & 0xFF}.#{(sockaddr_in.value.sin_addr.s_addr >> 8) & 0xFF}.#{(sockaddr_in.value.sin_addr.s_addr >> 16) & 0xFF}.#{sockaddr_in.value.sin_addr.s_addr >> 24}"
             ip_address = Socket::IPAddress.new(address, 0)
-  
+
             list << ip_address
-          elsif sockaddr.value.sa_family == 23  # AF_INET6 = 23 (IPv6)
+          elsif sockaddr.value.sa_family == 23 # AF_INET6 = 23 (IPv6)
             sockaddr_in6 = sockaddr.as(Pointer(LibC::SockaddrIn6))
             ipv6_addr = sockaddr_in6.value.sin6_addr.u.byte
             address = ipv6_addr.each_slice(2).map { |slice| "%02x%02x" % slice }.join(':')
             ip_address = Socket::IPAddress.new(address, 0)
-  
+
             list << ip_address
           end
-  
+
           unicast_address = unicast_address.value.next
         end
-  
+
         adapter = adapter.value.next
       end
       list
