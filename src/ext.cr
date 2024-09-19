@@ -104,13 +104,13 @@ class Socket
 
           if sockaddr.value.sa_family == 2 # AF_INET = 2 (IPv4)
             sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
-            
+
             ip_address = Socket::IPAddress.from(sockaddr_in, sizeof(typeof(sockaddr_in)))
 
             list << ip_address
           elsif sockaddr.value.sa_family == 23 # AF_INET6 = 23 (IPv6)
             sockaddr_in6 = sockaddr.as(Pointer(LibC::SockaddrIn6))
-            
+
             ip_address = Socket::IPAddress.from(sockaddr_in6, sizeof(typeof(sockaddr_in6)))
 
             list << ip_address
