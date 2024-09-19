@@ -43,8 +43,9 @@ require "lib_c"
 {% end %}
 
 class Socket
-  {% if flag?(:linux) || flag?(:darwin) %}
-    def self.ip_address_list : Array(Socket::IPAddress)
+  # Returns local IP addresses as an array of `Socket::IPAddress` objects.
+  def self.ip_address_list : Array(Socket::IPAddress)
+    {% if flag?(:linux) || flag?(:darwin) %}
       ptr = Pointer(Pointer(LibC::Ifaddrs)).malloc(1)
       ret = LibC.getifaddrs(ptr)
 
@@ -86,11 +87,7 @@ class Socket
       LibC.freeifaddrs(ptr.value)
 
       list
-    end
-  {% end %}
-
-  {% if flag?(:win32) %}
-    def self.ip_address_list : Array(Socket::IPAddress)
+    {% elsif flag?(:win32) %}
       buffer_size = Pointer(UInt32).malloc(1)
       buffer_size.value = 15000 # Start with a reasonable buffer size
       buffer = Pointer(LibC::IP_ADAPTER_ADDRESSES).malloc(buffer_size.value)
@@ -130,8 +127,10 @@ class Socket
         adapter = adapter.value.next
       end
       list
-    end
-  {% end %}
+    {% else %}
+      raise NotImplementedError.new("Socket.ip_address_list")
+    {% end %}
+  end
 end
 
 class Socket
