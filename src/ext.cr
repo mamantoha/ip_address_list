@@ -61,16 +61,24 @@ class Socket
           next
         end
 
-        sockaddr_in = addr.value.ifa_addr.as(Pointer(LibC::SockaddrIn))
+        sockaddr = addr.value.ifa_addr.as(Pointer(LibC::SockaddrIn))
 
-        unless sockaddr_in.value.sin_family.in?([Socket::Family::INET.to_i, Socket::Family::INET6.to_i])
+        if sockaddr.value.sin_family == Socket::Family::INET.to_i
+          sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
+
+          ip_address = Socket::IPAddress.from(sockaddr_in, sizeof(typeof(sockaddr_in)))
+
+          list << ip_address
+        elsif sockaddr.value.sin_family == Socket::Family::INET6.to_i
+          sockaddr_in6 = sockaddr.as(Pointer(LibC::SockaddrIn6))
+
+          ip_address = Socket::IPAddress.from(sockaddr_in6, sizeof(typeof(sockaddr_in6)))
+
+          list << ip_address
+        else
           addr = addr.value.ifa_next
           next
         end
-
-        ip_address = Socket::IPAddress.from(sockaddr_in, sizeof(typeof(sockaddr_in)))
-
-        list << ip_address
 
         addr = addr.value.ifa_next
       end
@@ -128,26 +136,8 @@ end
 
 class Socket
   struct IPAddress
-    def self.from(sockaddr : LibC::SockaddrIn*, addrlen) : IPAddress
-      case family = Family.new(sockaddr.value.sin_family.to_u8)
-      when Family::INET6
-        new(sockaddr.as(LibC::SockaddrIn6*), addrlen.to_i)
-      when Family::INET
-        new(sockaddr.as(LibC::SockaddrIn*), addrlen.to_i)
-      else
-        raise "Unsupported family type: #{family} (#{family.value})"
-      end
-    end
-
-    def self.from(sockaddr : LibC::SockaddrIn6*, addrlen) : IPAddress
-      case family = Family.new(sockaddr.value.sin6_family.to_u8)
-      when Family::INET6
-        new(sockaddr.as(LibC::SockaddrIn6*), addrlen.to_i)
-      when Family::INET
-        new(sockaddr.as(LibC::SockaddrIn*), addrlen.to_i)
-      else
-        raise "Unsupported family type: #{family} (#{family.value})"
-      end
+    def self.from(sockaddr_in : LibC::SockaddrIn* | LibC::SockaddrIn6*, addrlen) : IPAddress
+      new(sockaddr_in, addrlen.to_i)
     end
   end
 end
