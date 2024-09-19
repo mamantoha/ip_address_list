@@ -87,7 +87,7 @@ class Socket
   {% if flag?(:win32) %}
     def self.ip_address_list : Array(Socket::IPAddress)
       buffer_size = Pointer(UInt32).malloc(1)
-      buffer_size.value = 15000  # Start with a reasonable buffer size
+      buffer_size.value = 15000 # Start with a reasonable buffer size
       buffer = Pointer(LibC::IP_ADAPTER_ADDRESSES).malloc(buffer_size.value)
 
       ret = LibC.GetAdaptersAddresses(LibC::AF_UNSPEC, 0, nil, buffer, buffer_size)
@@ -105,12 +105,12 @@ class Socket
         while unicast_address
           sockaddr = unicast_address.value.address.as(Pointer(LibC::SOCKADDR))
 
-          if sockaddr.value.sa_family == 2  # AF_INET = 2 (IPv4)
+          if sockaddr.value.sa_family == 2 # AF_INET = 2 (IPv4)
             address = "#{sockaddr.value.sa_data[2]}.#{sockaddr.value.sa_data[3]}.#{sockaddr.value.sa_data[4]}.#{sockaddr.value.sa_data[5]}"
             ip_address = Socket::IPAddress.new(address, 0)
 
             list << ip_address
-          elsif sockaddr.value.sa_family == 23  # AF_INET6 = 23 (IPv6)
+          elsif sockaddr.value.sa_family == 23 # AF_INET6 = 23 (IPv6)
             ipv6_addr = sockaddr.value.sa_data.to_a[6, 16]
 
             address = ipv6_addr.each_slice(2).map { |slice| "%02x%02x" % slice }.join(':')
