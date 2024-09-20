@@ -2,8 +2,8 @@ name: ip_address_list
 version: 0.1.0
 
 authors:
-  - Anton Maminov <anton.linux@gmail.com>
+  - Anton Maminov <anton.mamainov@gmail.com>
 
-crystal: '>= 1.14.0-dev'
+crystal: '>= 1.0.0'
 
 license: MIT
