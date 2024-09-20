@@ -20,21 +20,8 @@ class Socket
 
         sockaddr = addr.value.ifa_addr
 
-        if sockaddr.value.sa_family == Socket::Family::INET.to_i
-          sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
-
-          ip_address = Socket::IPAddress.from(sockaddr_in, sizeof(typeof(sockaddr_in)))
-
+        if ip_address = sockaddr_to_ip_address(sockaddr)
           list << ip_address
-        elsif sockaddr.value.sa_family == Socket::Family::INET6.to_i
-          sockaddr_in6 = sockaddr.as(Pointer(LibC::SockaddrIn6))
-
-          ip_address = Socket::IPAddress.from(sockaddr_in6, sizeof(typeof(sockaddr_in6)))
-
-          list << ip_address
-        else
-          addr = addr.value.ifa_next
-          next
         end
 
         addr = addr.value.ifa_next
@@ -63,17 +50,7 @@ class Socket
         while unicast_address
           sockaddr = unicast_address.value.address
 
-          if sockaddr.value.sa_family == Socket::Family::INET.to_i
-            sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
-
-            ip_address = Socket::IPAddress.from(sockaddr_in, sizeof(typeof(sockaddr_in)))
-
-            list << ip_address
-          elsif sockaddr.value.sa_family == Socket::Family::INET6.to_i
-            sockaddr_in6 = sockaddr.as(Pointer(LibC::SockaddrIn6))
-
-            ip_address = Socket::IPAddress.from(sockaddr_in6, sizeof(typeof(sockaddr_in6)))
-
+          if ip_address = sockaddr_to_ip_address(sockaddr)
             list << ip_address
           end
 
@@ -82,9 +59,23 @@ class Socket
 
         adapter = adapter.value.next
       end
+
       list
     {% else %}
       raise NotImplementedError.new("Socket.ip_address_list")
     {% end %}
+  end
+
+  private def self.sockaddr_to_ip_address(sockaddr : LibC::Sockaddr*) : Socket::IPAddress?
+    case sockaddr.value.sa_family
+    when Socket::Family::INET.to_i
+      sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
+
+      Socket::IPAddress.from(sockaddr_in, sizeof(typeof(sockaddr_in)))
+    when Socket::Family::INET6.to_i
+      sockaddr_in6 = sockaddr.as(Pointer(LibC::SockaddrIn6))
+
+      Socket::IPAddress.from(sockaddr_in6, sizeof(typeof(sockaddr_in6)))
+    end
   end
 end
