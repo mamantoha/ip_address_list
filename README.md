@@ -42,7 +42,7 @@ p! Socket.ip_address_list
 
 ### Windows Implementation
 
-On Windows, this library uses the `GetAdaptersAddresses` function to retrieve network interface information, including IP addresses. You can find more information about GetAdaptersAddresses in the Microsoft [documentation](https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses).
+On Windows, this library uses the `GetAdaptersAddresses` function to retrieve network interface information, including IP addresses. You can find more information about `GetAdaptersAddresses` in the Microsoft [documentation](https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses).
 
 ### Linux and macOS Implementation
 
