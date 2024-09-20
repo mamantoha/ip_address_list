@@ -1,47 +1,3 @@
-require "socket"
-require "lib_c"
-
-{% if flag?(:linux) || flag?(:darwin) %}
-  lib LibC
-    struct Ifaddrs
-      ifa_next : Pointer(Ifaddrs)
-      ifa_name : UInt64
-      ifa_flags : UInt32
-      ifa_addr : Pointer(LibC::Sockaddr)
-      ifa_netmask : Pointer(Void)
-      ifa_broadaddr : Pointer(Void)
-      ifa_data : Pointer(Void)
-    end
-
-    fun getifaddrs(addrs : Pointer(Pointer(Ifaddrs))) : Int32
-    fun freeifaddrs(addrs : Pointer(Ifaddrs)) : Void
-  end
-{% end %}
-
-{% if flag?(:win32) %}
-  @[Link("iphlpapi")]
-  lib LibC
-    # https://learn.microsoft.com/en-us/windows/win32/api/iptypes/ns-iptypes-ip_adapter_addresses_lh
-    struct IP_ADAPTER_ADDRESSES
-      length : UInt32
-      if_index : UInt32
-      next : Pointer(IP_ADAPTER_ADDRESSES)
-      adapter_name : Pointer(UInt8)
-      first_unicast_address : Pointer(LibC::IP_ADAPTER_UNICAST_ADDRESS)
-    end
-
-    struct IP_ADAPTER_UNICAST_ADDRESS
-      length : UInt32
-      flags : UInt32
-      next : Pointer(IP_ADAPTER_UNICAST_ADDRESS)
-      address : Pointer(LibC::Sockaddr)
-    end
-
-    # https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
-    fun GetAdaptersAddresses(family : UInt32, flags : UInt32, reserved : Pointer(Void), addresses : Pointer(IP_ADAPTER_ADDRESSES), size : Pointer(UInt32)) : Int32
-  end
-{% end %}
-
 class Socket
   # Returns local IP addresses as an array of `Socket::IPAddress` objects.
   def self.ip_address_list : Array(Socket::IPAddress)
@@ -130,13 +86,5 @@ class Socket
     {% else %}
       raise NotImplementedError.new("Socket.ip_address_list")
     {% end %}
-  end
-end
-
-class Socket
-  struct IPAddress
-    def self.from(sockaddr_in : LibC::SockaddrIn* | LibC::SockaddrIn6*, addrlen) : IPAddress
-      new(sockaddr_in, addrlen.to_i)
-    end
   end
 end
