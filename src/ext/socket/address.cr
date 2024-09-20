@@ -3,13 +3,13 @@ class Socket
     def self.from(sockaddr : LibC::Sockaddr*) : IPAddress
       case family = Family.new(sockaddr.value.sa_family)
       when Family::INET
-        sockaddr_in = sockaddr.as(LibC::SockaddrIn*)
+        sockaddr = sockaddr.as(LibC::SockaddrIn*)
 
-        new(sockaddr_in, sizeof(typeof(sockaddr_in)))
+        new(sockaddr, sizeof(typeof(sockaddr)))
       when Family::INET6
-        sockaddr_in = sockaddr.as(LibC::SockaddrIn6*)
+        sockaddr = sockaddr.as(LibC::SockaddrIn6*)
 
-        new(sockaddr_in, sizeof(typeof(sockaddr_in)))
+        new(sockaddr, sizeof(typeof(sockaddr)))
       else
         raise "Unsupported family type: #{family} (#{family.value})"
       end
@@ -18,13 +18,13 @@ class Socket
     def self.from?(sockaddr : LibC::Sockaddr*) : IPAddress?
       case family = Family.new(sockaddr.value.sa_family)
       when Family::INET
-        sockaddr_in = sockaddr.as(LibC::SockaddrIn*)
+        sockaddr = sockaddr.as(LibC::SockaddrIn*)
 
-        new(sockaddr_in, sizeof(typeof(sockaddr_in)))
+        new(sockaddr, sizeof(typeof(sockaddr)))
       when Family::INET6
-        sockaddr_in = sockaddr.as(LibC::SockaddrIn6*)
+        sockaddr = sockaddr.as(LibC::SockaddrIn6*)
 
-        new(sockaddr_in, sizeof(typeof(sockaddr_in)))
+        new(sockaddr, sizeof(typeof(sockaddr)))
       else
         nil
       end
