@@ -5,9 +5,7 @@ class Socket
       ptr = Pointer(Pointer(LibC::Ifaddrs)).malloc(1)
       ret = LibC.getifaddrs(ptr)
 
-      if ret == -1
-        raise raise Socket::Error.new("Failed to get network interfaces")
-      end
+      raise raise Socket::Error.new("Failed to get network interfaces") if ret == -1
 
       list = [] of Socket::IPAddress
       addr = ptr.value
@@ -20,9 +18,7 @@ class Socket
 
         sockaddr = addr.value.ifa_addr
 
-        if ip_address = sockaddr_to_ip_address(sockaddr)
-          list << ip_address
-        end
+        sockaddr_to_ip_address(sockaddr).try { |ip_address| list << ip_address }
 
         addr = addr.value.ifa_next
       end
@@ -37,9 +33,7 @@ class Socket
 
       ret = LibC.GetAdaptersAddresses(LibC::AF_UNSPEC, 0, nil, buffer, buffer_size)
 
-      if ret != 0
-        raise Socket::Error.new("Failed to get network interfaces")
-      end
+      raise Socket::Error.new("Failed to get network interfaces") if ret != 0
 
       list = [] of Socket::IPAddress
       adapter = buffer
@@ -50,9 +44,7 @@ class Socket
         while unicast_address
           sockaddr = unicast_address.value.address
 
-          if ip_address = sockaddr_to_ip_address(sockaddr)
-            list << ip_address
-          end
+          sockaddr_to_ip_address(sockaddr).try { |ip_address| list << ip_address }
 
           unicast_address = unicast_address.value.next
         end
