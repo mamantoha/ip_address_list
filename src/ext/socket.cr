@@ -18,7 +18,7 @@ class Socket
 
         sockaddr = addr.value.ifa_addr
 
-        sockaddr_to_ip_address(sockaddr).try { |ip_address| list << ip_address }
+        Socket::IPAddress.from?(sockaddr).try { |ip_address| list << ip_address }
 
         addr = addr.value.ifa_next
       end
@@ -44,7 +44,7 @@ class Socket
         while unicast_address
           sockaddr = unicast_address.value.address
 
-          sockaddr_to_ip_address(sockaddr).try { |ip_address| list << ip_address }
+          Socket::IPAddress.from?(sockaddr).try { |ip_address| list << ip_address }
 
           unicast_address = unicast_address.value.next
         end
@@ -56,18 +56,5 @@ class Socket
     {% else %}
       raise NotImplementedError.new("Socket.ip_address_list")
     {% end %}
-  end
-
-  private def self.sockaddr_to_ip_address(sockaddr : LibC::Sockaddr*) : Socket::IPAddress?
-    case sockaddr.value.sa_family
-    when Socket::Family::INET.to_i
-      sockaddr_in = sockaddr.as(Pointer(LibC::SockaddrIn))
-
-      Socket::IPAddress.from(sockaddr_in, sizeof(typeof(sockaddr_in)))
-    when Socket::Family::INET6.to_i
-      sockaddr_in6 = sockaddr.as(Pointer(LibC::SockaddrIn6))
-
-      Socket::IPAddress.from(sockaddr_in6, sizeof(typeof(sockaddr_in6)))
-    end
   end
 end
