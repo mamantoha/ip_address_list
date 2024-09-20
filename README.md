@@ -1,6 +1,8 @@
 # Crystal IP Address List Library
 
 [![Crystal CI](https://github.com/mamantoha/ip_address_list/actions/workflows/crystal.yml/badge.svg)](https://github.com/mamantoha/ip_address_list/actions/workflows/crystal.yml)
+[![GitHub release](https://img.shields.io/github/release/mamantoha/ip_address_list.svg)](https://github.com/mamantoha/ip_address_list/releases)
+[![License](https://img.shields.io/github/license/mamantoha/ip_address_list.svg)](https://github.com/mamantoha/ip_address_list/blob/master/LICENSE)
 
 This library provides functionality to retrieve the IP addresses (both IPv4 and IPv6) associated with the network interfaces on a system. It is a port of Ruby's `ip_address_list` method from the `Socket` class.
 
