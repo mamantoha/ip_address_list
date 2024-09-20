@@ -38,6 +38,16 @@ p! Socket.ip_address_list
 #     ...]
 ```
 
+## Technical Notes
+
+### Windows Implementation
+
+On Windows, this library uses the `GetAdaptersAddresses` function to retrieve network interface information, including IP addresses. You can find more information about GetAdaptersAddresses in the Microsoft [documentation](https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses).
+
+### Linux and macOS Implementation
+
+On Linux and macOS, the library uses the `getifaddrs` function to gather network interface information. This function is part of the standard C library and provides a linked list of structures describing the network interfaces of the local system. More details about `getifaddrs` can be found in the [Linux man page](https://man7.org/linux/man-pages/man3/getifaddrs.3.html) and the [macOS documentation](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/getifaddrs.3.html).
+
 ## Contributing
 
 1. Fork it (<https://github.com/mamantoha/ip_address_list/fork>)
