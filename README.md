@@ -33,7 +33,8 @@ p! Socket.ip_address_list
 # => [Socket::IPAddress(127.0.0.1:0),
 #     Socket::IPAddress(192.168.31.229:0),
 #     Socket::IPAddress(172.17.0.1:0),
-#     Socket::IPAddress([::1]:0), Socket::IPAddress([fdcc:60fc:349d:2fcf:7e6:1635:e1a7:1fb6]:0),
+#     Socket::IPAddress([::1]:0),
+#     Socket::IPAddress([fdcc:60fc:349d:2fcf:7e6:1635:e1a7:1fb6]:0),
 #     Socket::IPAddress([fe80::c8e3:857d:43c8:cec3]:0)
 #     ...]
 ```
