@@ -25,6 +25,8 @@ class Socket
         sockaddr_in = sockaddr.as(LibC::SockaddrIn6*)
 
         new(sockaddr_in, sizeof(typeof(sockaddr_in)))
+      else
+        nil
       end
     end
   end
