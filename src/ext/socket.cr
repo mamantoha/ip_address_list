@@ -47,7 +47,7 @@ class Socket
         p_unicast = p_curr_addresses.value.first_unicast_address
 
         while p_unicast
-          sockaddr = unicast_address.value.address
+          sockaddr = p_unicast.value.address
 
           Socket::IPAddress.from?(sockaddr).try { |ip_address| list << ip_address }
 
