@@ -27,30 +27,34 @@ class Socket
 
       list
     {% elsif flag?(:win32) %}
-      out_buf_len = Pointer(UInt32).malloc(1)
-      out_buf_len.value = 15_000 # Allocate a 15 KB buffer to start with.
+      # Allocate a 15 KB buffer to start with.
+      out_buf_len = 15_000_u32
+      
+      p_addresses = Pointer(LibC::IP_ADAPTER_ADDRESSES).malloc(out_buf_len)
 
-      p_addresses = Pointer(LibC::IP_ADAPTER_ADDRESSES).malloc(out_buf_len.value)
+      # Unicast, anycast, and multicast IP addresses will be returned
+      flags = 0
 
-      dw_ret_val = LibC.GetAdaptersAddresses(LibC::AF_UNSPEC, 0, nil, p_addresses, out_buf_len)
+      dw_ret_val = LibC.GetAdaptersAddresses(LibC::AF_UNSPEC, flags, nil, p_addresses, pointerof(out_buf_len))
 
       raise Socket::Error.new("Failed to get network interfaces") if dw_ret_val != 0
 
       list = [] of Socket::IPAddress
-      adapter = p_addresses
+      
+      p_curr_addresses = p_addresses
 
-      while adapter
-        unicast_address = adapter.value.first_unicast_address
+      while p_curr_addresses
+        p_unicast = p_curr_addresses.value.first_unicast_address
 
-        while unicast_address
+        while p_unicast
           sockaddr = unicast_address.value.address
 
           Socket::IPAddress.from?(sockaddr).try { |ip_address| list << ip_address }
 
-          unicast_address = unicast_address.value.next
+          p_unicast = p_unicast.value.next
         end
 
-        adapter = adapter.value.next
+        p_curr_addresses = p_curr_addresses.value.next
       end
 
       list
