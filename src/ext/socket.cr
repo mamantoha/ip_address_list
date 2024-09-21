@@ -29,7 +29,7 @@ class Socket
     {% elsif flag?(:win32) %}
       # Allocate a 15 KB buffer to start with.
       out_buf_len = 15_000_u32
-      
+
       p_addresses = Pointer(LibC::IP_ADAPTER_ADDRESSES).malloc(out_buf_len)
 
       # Unicast, anycast, and multicast IP addresses will be returned
@@ -40,7 +40,7 @@ class Socket
       raise Socket::Error.new("Failed to get network interfaces") if dw_ret_val != 0
 
       list = [] of Socket::IPAddress
-      
+
       p_curr_addresses = p_addresses
 
       while p_curr_addresses
