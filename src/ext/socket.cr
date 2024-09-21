@@ -27,16 +27,17 @@ class Socket
 
       list
     {% elsif flag?(:win32) %}
-      buffer_size = Pointer(UInt32).malloc(1)
-      buffer_size.value = 15000 # Start with a reasonable buffer size
-      buffer = Pointer(LibC::IP_ADAPTER_ADDRESSES).malloc(buffer_size.value)
+      out_buf_len = Pointer(UInt32).malloc(1)
+      out_buf_len.value = 15_000 # Allocate a 15 KB buffer to start with.
 
-      ret = LibC.GetAdaptersAddresses(LibC::AF_UNSPEC, 0, nil, buffer, buffer_size)
+      p_addresses = Pointer(LibC::IP_ADAPTER_ADDRESSES).malloc(out_buf_len.value)
 
-      raise Socket::Error.new("Failed to get network interfaces") if ret != 0
+      dw_ret_val = LibC.GetAdaptersAddresses(LibC::AF_UNSPEC, 0, nil, p_addresses, out_buf_len)
+
+      raise Socket::Error.new("Failed to get network interfaces") if dw_ret_val != 0
 
       list = [] of Socket::IPAddress
-      adapter = buffer
+      adapter = p_addresses
 
       while adapter
         unicast_address = adapter.value.first_unicast_address
