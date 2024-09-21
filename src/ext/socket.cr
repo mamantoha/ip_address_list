@@ -27,6 +27,8 @@ class Socket
 
       list
     {% elsif flag?(:win32) %}
+      # https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses#examples
+
       # Allocate a 15 KB buffer to start with.
       out_buf_len = 15_000_u32
 
