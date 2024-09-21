@@ -17,5 +17,11 @@ lib LibC
   end
 
   # https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
-  fun GetAdaptersAddresses(family : UInt32, flags : UInt32, reserved : Pointer(Void), addresses : Pointer(IP_ADAPTER_ADDRESSES), size : Pointer(UInt32)) : Int32
+  fun GetAdaptersAddresses(
+    family : UInt32,
+    flags : UInt32,
+    reserved : Pointer(Void),
+    addresses : Pointer(IP_ADAPTER_ADDRESSES),
+    size : Pointer(UInt32)
+  ) : Int32
 end

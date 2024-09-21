@@ -16,7 +16,7 @@ class Socket
     end
 
     def self.from?(sockaddr : LibC::Sockaddr*) : IPAddress?
-      case family = Family.new(sockaddr.value.sa_family)
+      case Family.new(sockaddr.value.sa_family)
       when Family::INET
         sockaddr = sockaddr.as(LibC::SockaddrIn*)
 
