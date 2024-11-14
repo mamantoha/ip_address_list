@@ -5,7 +5,7 @@ require "lib_c"
   require "./ext/lib_c/ifaddrs"
 {% end %}
 
-{% if flag?(:win32) %}
+{% if flag?(:windows) %}
   require "./ext/lib_c/get_adapters_addresses"
 {% end %}
 

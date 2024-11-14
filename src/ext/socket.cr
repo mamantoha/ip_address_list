@@ -26,7 +26,7 @@ class Socket
       LibC.freeifaddrs(ptr.value)
 
       list
-    {% elsif flag?(:win32) %}
+    {% elsif flag?(:windows) %}
       # https://learn.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses#examples
 
       # Allocate a 15 KB buffer to start with.
