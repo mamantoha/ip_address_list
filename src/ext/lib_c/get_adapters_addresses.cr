@@ -22,6 +22,6 @@ lib LibC
     flags : UInt32,
     reserved : Pointer(Void),
     addresses : Pointer(IP_ADAPTER_ADDRESSES),
-    size : Pointer(UInt32)
+    size : Pointer(UInt32),
   ) : Int32
 end
